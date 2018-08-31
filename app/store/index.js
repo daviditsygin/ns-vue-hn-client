@@ -13,28 +13,27 @@ const store = new Vuex.Store({
     counter,
   },
   state: {
-    postList: {}
+    postList: {},
+    viewPost: {id: 'test post'}
   },
   mutations: {
     addPostToList (state, newPost){
-      // state.postList.splice(newPost, 1, {text: newPost})
-      Vue.set(state.postList, newPost, {score: 0, title: 'Loading data...'})
-      // state.[] = 
-      // console.log(state.postList)
-      // console.log('ADD POST TO LIST')
+      Vue.set(state.postList, newPost, {score: 0, title: 'Loading data...', descendants: 0})
     },
     updatePost (state, post){
-      // state.postList.splice(newPost, 1, {text: newPost})
       Vue.set(state.postList, post.id, post)
-      // state.[] = 
-      // console.log(state.postList)
-      // console.log('ADD POST TO LIST')
+    },
+    setViewPost(state, post){
+      state.viewPost = post
     }
   },
   getters: {
     posts(state){
       const posts = Object.values(state.postList)
       return posts
+    },
+    viewPost(state){
+      return state.viewPost
     }
   },
   strict: (TNS_ENV === 'debug'),
