@@ -4,6 +4,8 @@ import router from './router';
 
 import store from './store';
 
+import './RadListView'
+
 import './styles.scss';
 
 // Prints Vue logs when --env.production is *NOT* set while building

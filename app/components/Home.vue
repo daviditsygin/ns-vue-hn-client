@@ -13,11 +13,29 @@
       </v-template>
     </ListView> -->
 
-    <ListView class="list-group" for="item in posts" @itemTap="$router.push('/hello')">
+    <!-- <ListView class="list-group" for="item in posts" @itemTap="$router.push('/hello')">
       <v-template>
         <PostListItem :item="item" />
       </v-template>
-    </ListView>
+    </ListView> -->
+
+        <RadListView for="item in posts" pullToRefresh="true" @pullToRefreshInitiated="fetchItems" @itemTap="$router.push('/hello')" class="list-group" backgroundColor="#303030">
+			    <ListViewLinearLayout v-tkListViewLayout scrollDirection="Vertical" />
+          <PullToRefreshStyle indicatorColor="red" indicatorBackgroundColor="blue"/>
+          <v-template name="header">
+            <StackLayout backgroundColor="#4c4c4c" padding="10 10 10 10">
+              <Label class="c-white text-center h3" text="Top Stories" />
+            </StackLayout>
+          </v-template>
+          <v-template name="footer">
+            <StackLayout backgroundColor="#303030">
+              <Label class="c-white h3" text="footer" />
+            </StackLayout>
+          </v-template>
+          <v-template>
+            <PostListItem :item="item" />
+          </v-template>
+        </RadListView>
 
 
   </Page>
@@ -42,9 +60,14 @@ export default {
     }
 	},
   methods: {
-    fetchItems() {
+    fetchItems(args) {
       this.$http.getJSON("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty").then(result => {
         console.log(result.length)
+        result = result.splice(0, 25)
+        if  (args){
+          args.object.notifyPullToRefreshFinished()
+        }
+        
         result.forEach((p) => {
           // console.log(p)
           this.$store.commit('addPostToList', p)
