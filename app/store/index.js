@@ -14,14 +14,17 @@ const store = new Vuex.Store({
   },
   state: {
     postList: {},
-    viewPost: {id: 'test post'}
+    viewPost: {}
   },
   mutations: {
-    addPostToList (state, newPost){
-      Vue.set(state.postList, newPost, {score: 0, title: 'Loading data...', descendants: 0})
+    clearList(state){
+      state.postList = {}
     },
-    updatePost (state, post){
-      Vue.set(state.postList, post.id, post)
+    addPostToList (state, obj){
+      Vue.set(state.postList, obj.idx, {id: obj.id, score: 0, title: 'Loading data...', descendants: 0})
+    },
+    updatePost (state, obj){
+      Vue.set(state.postList, obj.idx, obj.post)
     },
     setViewPost(state, post){
       state.viewPost = post

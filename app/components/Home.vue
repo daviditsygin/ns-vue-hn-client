@@ -1,7 +1,8 @@
 <template>
   <Page class="page">
-    <ActionBar class="action-bar" title="Hacker News"/>
-    <RadListView for="item in posts" pullToRefresh="true" @pullToRefreshInitiated="fetchItems" @itemTap="openPost" class="list-group" backgroundColor="#303030">
+    <ActionBar class="action-bar" title="Home"/>
+
+    <RadListView for="item in posts" pullToRefresh="true" @pullToRefreshInitiated="refresh" @itemTap="openPost" class="list-group">
       <ListViewLinearLayout v-tkListViewLayout scrollDirection="Vertical" />
       <PullToRefreshStyle indicatorColor="red" indicatorBackgroundColor="blue"/>
       <v-template name="header">
@@ -10,14 +11,25 @@
         </StackLayout>
       </v-template>
       <v-template name="footer">
-        <StackLayout backgroundColor="#303030">
-          <Label class="c-white h3" text="footer" />
+        <StackLayout>
+          <Button @tap="loadMore" >Load more...</Button>
         </StackLayout>
       </v-template>
       <v-template>
         <PostListItem :item="item" />
       </v-template>
     </RadListView>
+    <!-- <StackLayout>
+      <Button class="btn btn-primary" @tap="$router.push('/counter')">Counter</Button>
+      <Button class="btn btn-primary" @tap="$router.push('/post')">Hello World</Button>
+
+      <ListView class="list-group" for="item in posts" @itemTap="openPost">
+        <v-template>
+          <PostListItem :item="item" />
+        </v-template>
+      </ListView>
+
+    </StackLayout> -->
   </Page>
 </template>
 
@@ -38,39 +50,55 @@ export default {
 		posts(){
       return this.$store.getters.posts
     }
-	},
+  },
+  data () {
+    return {
+      postIndex: 0,
+      postLimit: 30
+    };
+  },
   methods: {
     fetchItems(args) {
       this.$http.getJSON("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty").then(result => {
-        console.log(result.length)
-        result = result.splice(0, 30)
-        if  (args){
+        result = result.splice(this.postIndex, this.postLimit)
+        if (args){
+          console.log('in args')
           args.object.notifyPullToRefreshFinished()
         }
-        
+        console.log(result.length)
+        var idx = this.postIndex
         result.forEach((p) => {
-          this.$store.commit('addPostToList', p)
-          this.resolvePost(p)
+          this.$store.commit('addPostToList', {id: p, idx: idx})
+          this.resolvePost(p, idx)
+          idx++
+          console.log(idx)
         })
+        this.postIndex += this.postLimit
+        console.log(this.postIndex)
       }, error => {
-        console.log(error);
+        console.log(error)
       });
     },
-    resolvePost(p){
-      
+    resolvePost(p, idx){
       this.$http.getJSON("https://hacker-news.firebaseio.com/v0/item/"+p+".json?print=pretty").then(result => {
-        this.$store.commit('updatePost', result)
+        this.$store.commit('updatePost', {post: result, idx: idx})
       }, error => {
-        console.log(error);
+        console.log(error)
       });
+    },
+    refresh(args){
+      this.postIndex = 0
+      this.$store.commit('clearList')
+      this.fetchItems(args)
     },
     openPost(event){
       console.log(this.$route.path)
-      this.$router.replace('/home');
-      // this.$store.viewPost = event.item
       this.$store.commit('setViewPost', event.item)
       this.$router.push('/post')
       console.log(this.$route.path)
+    },
+    loadMore(args){
+      this.fetchItems()
     }
   }
 }
