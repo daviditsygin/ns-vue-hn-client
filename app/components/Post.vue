@@ -5,42 +5,100 @@
     </ActionBar>
     <StackLayout>
       <Button textWrap=true :text="viewPost.url"/>
-      <!-- <Button class="btn btn-primary" @tap="$router.back()" text="Tap me!"/> -->
       <Label class="text-center">{{viewPost.descendants}} comments</Label>
-      <ListView class="list-group" for="item in posts" @itemTap="$router.push('/hello')">
+      <ListView class="list-group" for="item in nested_comments" @itemTap="$router.push('/hello')">
         <v-template>
-          <PostListItem :item="item" />
+          <CommentListItem :item="item" />
         </v-template>
       </ListView>
     </StackLayout>
+      <!-- <ListView class="list-group" for="item in nested_comments" @itemTap="$router.push('/hello')">
+        <v-template>
+          <CommentListItem :item="item" />
+        </v-template>
+      </ListView> -->
   </Page>
 </template>
 
 <script>
 
-  // import CommentListItem from '@/components/CommentListItem'
-  import PostListItem from '@/components/PostListItem'
+  import CommentListItem from '@/components/CommentListItem'
+  import Vue from 'nativescript-vue';
+  import decode from 'unescape';
   export default {
     components: {
-      PostListItem
+      CommentListItem
+    },
+    data () {
+      return {
+        ncomments: {}
+      };
     },
     computed: {
       viewPost(){
-        console.log('VIEW POST COMPUTED')
-        console.log(this.$store.getters.viewPost)
         return this.$store.getters.viewPost
       },
       posts(){
         return this.$store.getters.posts
+      },
+      comments(){
+        return this.$store.getters.comments
+      },
+      nested_comments(){
+        var arr = []
+        if (this.ncomments){
+          Object.values(this.ncomments).forEach((c) => {
+            arr.push(c)
+            if (c.nested){
+              this.pushNested(c, arr, 5)
+            }
+          })
+        }
+        return arr
       }
     },
     created: function () {
-      console.log('testing')
-      this.fetchComments()
+      this.fetchComments(this.viewPost.kids, this.ncomments)
     },
     methods: {
-      fetchComments(){
+      pushNested(c, arr, level){
+        Object.values(c.nested).forEach((n) => {
+          if (!n.text){
+            //not resolved
+            return
+          }
+          else {
+            n.level = level
+            arr.push(n)
+            if (n.nested){
+              this.pushNested(n, arr, level+5)
+            }
+          }
+
+        })
+      },
+      fetchComments(list, parent){
         console.log('FETCHING COMMENTS')
+        var idx = 0
+        list.forEach((comment) => {
+          Vue.set(parent, idx, {})
+          Vue.set(parent[idx], 'id', comment)
+          this.resolveComment(idx, parent)
+          idx++
+        })
+      },
+      resolveComment(idx, parent){
+        this.$http.getJSON("https://hacker-news.firebaseio.com/v0/item/"+parent[idx].id+".json?print=pretty").then(result => {
+          result.text = decode(result.text)
+          Vue.set(parent, idx, result)
+          Vue.set(parent[idx], 'level', 0)
+          if (result.kids){
+            Vue.set(parent[idx], 'nested', {})
+            this.fetchComments(parent[idx].kids, parent[idx].nested)
+          }
+          }, error => {
+            console.log(error)
+        });
       }
     }
   };

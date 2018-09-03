@@ -14,7 +14,8 @@ const store = new Vuex.Store({
   },
   state: {
     postList: {},
-    viewPost: {}
+    viewPost: {},
+    comments: {}
   },
   mutations: {
     clearList(state){
@@ -28,12 +29,20 @@ const store = new Vuex.Store({
     },
     setViewPost(state, post){
       state.viewPost = post
+    },
+    addComment(state, obj){
+      Vue.set(state.comments, obj.idx, {id: obj.id, text: 'Loading...', kids: {}})
+    },
+    updateComment(state, obj){
+      Vue.set(state.comments, obj.idx, obj.comment)
     }
   },
   getters: {
     posts(state){
-      const posts = Object.values(state.postList)
-      return posts
+      return Object.values(state.postList)
+    },
+    comments(state){
+      return Object.values(state.comments)
     },
     viewPost(state){
       return state.viewPost
