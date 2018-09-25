@@ -1,7 +1,7 @@
 <template>
   <Page class="page">
     <ActionBar class="action-bar" :title="viewPost.title" v-if="viewPost">
-      <NavigationButton text="Go Back" android.systemIcon="ic_menu_back" @tap="$router.push('/home')"/>
+      <NavigationButton text="Go Back" android.systemIcon="ic_menu_back" @tap="$router.back()"/>
     </ActionBar>
     <StackLayout>
       <Button textWrap=true :text="viewPost.url"/>
