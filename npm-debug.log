@@ -14,7 +14,7 @@
 4 verbose stack     at tryToString (fs.js:455:3)
 4 verbose stack     at FSReqWrap.readFileAfterClose [as oncomplete] (fs.js:442:12)
 5 verbose cwd /Users/daviditsygin/Documents/ns-vue-hn-client
-6 error Darwin 17.7.0
+6 error Darwin 18.0.0
 7 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "run" "dev"
 8 error node v6.9.5
 9 error npm  v3.10.10

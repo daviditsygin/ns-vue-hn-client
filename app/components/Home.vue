@@ -36,6 +36,7 @@
 <script>
 
 import PostListItem from '@/components/PostListItem'
+import Post from '@/components/Post'
 import { mapGetters, mapActions, mapMutations } from "vuex";
 export default {
   name: 'Home',
@@ -54,7 +55,8 @@ export default {
   data () {
     return {
       postIndex: 0,
-      postLimit: 30
+      postLimit: 30,
+      postPage: Post
     };
   },
   methods: {
@@ -94,7 +96,7 @@ export default {
     openPost(event){
       console.log(this.$route.path)
       this.$store.commit('setViewPost', event.item)
-      this.$router.push('/post')
+      this.$navigateTo(Post)
       console.log(this.$route.path)
     },
     loadMore(args){
