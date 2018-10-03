@@ -12,11 +12,6 @@
         </v-template>
       </ListView>
     </StackLayout>
-      <!-- <ListView class="list-group" for="item in nested_comments" @itemTap="$router.push('/hello')">
-        <v-template>
-          <CommentListItem :item="item" />
-        </v-template>
-      </ListView> -->
   </Page>
 </template>
 
